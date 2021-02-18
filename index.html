@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>pembuka Video | mn-belajar python</title>
+  <title>Pemutar Video | mn-belajar python</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="./css/styles.css" rel="stylesheet" />
   <link href="./css/index.css" rel="stylesheet" />
@@ -14,7 +14,8 @@
     <div style="position:absolute; top: 0; bottom: 0; overflow-y: scroll; overflow-x: scroll; width: 80%;">
       <div style="text-align: center; padding: 10px;">
         <video id="pemutarVideo" controls>
-        </video>
+        </video><br />
+        <span id="status" class="h4">Terjeda : </span><span class="h5" id="judul"></span>
       </div>
     </div>
   </div>
@@ -23,23 +24,59 @@
     </ul>
   </div>
   <div style="position: absolute; bottom: 0; left:25%;">
-    <input class="btn btn-info" id="pemilihVideo" type="file" accept=".mp4" multiple style="width: 20%;" />
-    <button class="btn btn-info" id="prev">&lt;</button>
-    <button class="btn btn-info" onclick="putar()">Putar</button>
-    <button class="btn btn-info" id="next">&gt;</button>
-    <button class="btn btn-info" onclick="reset()">Reset</button>
-    <input type="range" onChange="ubahUkuran()" value="50" class="form-range" min="1" max="500" id="nilaiUkuran">
+    <input class="btn btn-success" id="pemilihVideo" type="file" accept=".mp4" multiple style="width: 20%;" />
+    <button class="btn btn-success" id="prev">&lt;&lt;</button>
+    <button class="btn btn-success" id="putarPause" onclick="putarPause()">Putar</button>
+    <button class="btn btn-success" id="next">&gt;&gt;</button>
+    <button class="btn btn-success" onclick="rotasi()">Flip</button>
+    <button class="btn btn-success" onclick="reset()">Reset</button>
+    <input type="range" onChange="ubahUkuran()" value="50" class="form-range" min="1" max="200" id="nilaiUkuran">
   </div>
   <script src="js/jquery.min.js"></script>
 
   <script>
-    var nilaiPutar = 0;
+    var memutarVideo = false;
+    var pemutarVideo = $("#pemutarVideo")
+      .bind("play", function () {
+        memutarVideo = true;
+        $("#putarPause").html("Jeda")
+        $("#status").html("Memutar : ")
+      })
+      .bind("pause", function () {
+        memutarVideo = false;
+        $("#status").html("Terjeda : ")
+        $("#putarPause").html("Putar")
+      })
+      .bind("ended", function () {
+        $("#putarPause").html("Putar")
+        $("#status").html("Terjeda : ")
+        if (index + 1 < jumlahVideo) {
+          index++;
+          putarVideo(index);
+        } else {
+          index = 0;
+          putarVideo(index);
+        }
+      })
+      .get(0)
+
+    var nilaiRotasi = 0;
+
+    function putarPause() {
+      if (memutarVideo) {
+        pemutarVideo.pause();
+        memutarVideo = false;
+      } else {
+        pemutarVideo.play();
+        memutarVideo = true;
+      }
+    }
 
     function reset() {
       $("#nilaiUkuran").val(50)
       $("#pemutarVideo").width(50 + "%")
-      nilaiPutar = 360;
-      putar();
+      nilaiRotasi = 360;
+      rotasi();
     }
 
     function ubahUkuran() {
@@ -47,17 +84,17 @@
       $("#pemutarVideo").width(nilaiUkuran + "%")
     }
 
-    function putar() {
-      if (nilaiPutar == 0) {
-        nilaiPutar = 90
-      } else if (nilaiPutar == 90) {
-        nilaiPutar = 180
-      } else if (nilaiPutar == 180) {
-        nilaiPutar = 270
+    function rotasi() {
+      if (nilaiRotasi == 0) {
+        nilaiRotasi = 90
+      } else if (nilaiRotasi == 90) {
+        nilaiRotasi = 180
+      } else if (nilaiRotasi == 180) {
+        nilaiRotasi = 270
       } else {
-        nilaiPutar = 0
+        nilaiRotasi = 0
       }
-      $("#pemutarVideo").css({ 'transform': 'rotate(' + nilaiPutar + 'deg)' })
+      $("#pemutarVideo").css({ 'transform': 'rotate(' + nilaiRotasi + 'deg)' })
     }
 
     var index = 0,
@@ -90,11 +127,15 @@
         }
       }),
 
-      putarVideo = function (id) {
+      putarVideo = function (id, otomatis = true) {
         $(".videoTerpilih").removeClass("videoTerpilih");
         $("#tempatdaftarVideo li:eq(" + id + ")").addClass("videoTerpilih");
         index = id;
-        $("#pemutarVideo").attr("src", mediaPath + daftarVideo[id]);
+        $("#judul").html(daftarVideo[id])
+        pemutarVideo.src = mediaPath + daftarVideo[id];
+        if (otomatis) {
+          pemutarVideo.play()
+        }
       },
 
       pilihVideo = $("#pemilihVideo").change(function () {
@@ -131,11 +172,9 @@
           putarVideo(id);
         }
       })
-
-      putarVideo(index)
     }
     susunVideo();
-    putarVideo(index);
+    putarVideo(index, false);
 
   </script>
 </body>
