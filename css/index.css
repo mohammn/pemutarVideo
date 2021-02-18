@@ -1,0 +1,39 @@
+#daftarVideo ul {
+  list-style: none;
+  padding: 0;
+}
+
+#daftarVideo {
+  margin: 0;
+}
+
+#daftarVideo li {
+  background-color: #231f20;
+  cursor: pointer;
+  display: block;
+  margin: 0;
+  padding: 11px 0;
+}
+#daftarVideo li:hover {
+  background-color: #262223;
+}
+.isiDaftarVideo {
+  position: relative;
+}
+.videoTerpilih,
+.videoTerpilih:hover {
+  background-color: #262223 !important;
+  cursor: default !important;
+}
+
+#daftarVideo li {
+  background-color: #fafafa;
+}
+#daftarVideo li:hover {
+  background-color: #eee;
+}
+.videoTerpilih,
+.videoTerpilih:hover {
+  background-color: #eee !important;
+}
+

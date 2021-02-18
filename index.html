@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>pembuka Video | mn-belajar python</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="./css/styles.css" rel="stylesheet" />
+  <link href="./css/index.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div>
+    <div style="position:absolute; top: 0; bottom: 0; overflow-y: scroll; overflow-x: scroll; width: 80%;">
+      <div style="text-align: center; padding: 10px;">
+        <video id="pemutarVideo" controls>
+        </video>
+      </div>
+    </div>
+  </div>
+  <div id="daftarVideo" style="position: absolute; top: 0; bottom: 0; left:80%; width: 20%;overflow-y: scroll;">
+    <ul id="tempatdaftarVideo">
+    </ul>
+  </div>
+  <div style="position: absolute; bottom: 0; left:25%;">
+    <input class="btn btn-info" id="pemilihVideo" type="file" accept=".mp4" multiple style="width: 20%;" />
+    <button class="btn btn-info" id="prev">&lt;</button>
+    <button class="btn btn-info" onclick="putar()">Putar</button>
+    <button class="btn btn-info" id="next">&gt;</button>
+    <button class="btn btn-info" onclick="reset()">Reset</button>
+    <input type="range" onChange="ubahUkuran()" value="50" class="form-range" min="1" max="500" id="nilaiUkuran">
+  </div>
+  <script src="js/jquery.min.js"></script>
+
+  <script>
+    var nilaiPutar = 0;
+
+    function reset() {
+      $("#nilaiUkuran").val(50)
+      $("#pemutarVideo").width(50 + "%")
+      nilaiPutar = 360;
+      putar();
+    }
+
+    function ubahUkuran() {
+      var nilaiUkuran = $("#nilaiUkuran").val()
+      $("#pemutarVideo").width(nilaiUkuran + "%")
+    }
+
+    function putar() {
+      if (nilaiPutar == 0) {
+        nilaiPutar = 90
+      } else if (nilaiPutar == 90) {
+        nilaiPutar = 180
+      } else if (nilaiPutar == 180) {
+        nilaiPutar = 270
+      } else {
+        nilaiPutar = 0
+      }
+      $("#pemutarVideo").css({ 'transform': 'rotate(' + nilaiPutar + 'deg)' })
+    }
+
+    var index = 0,
+      playing = false,
+      mediaPath = "video/";
+
+    var daftarVideo = [];
+    if (localStorage.getItem("daftarVideo")) {
+      daftarVideo = localStorage.getItem("daftarVideo").split("=+=");
+    }
+    var jumlahVideo = daftarVideo.length;
+
+    var btnPrev = $("#prev").click(function () {
+      if (index - 1 > -1) {
+        index--;
+        putarVideo(index);
+      } else {
+        index = jumlahVideo - 1;
+        putarVideo(index);
+      }
+    }),
+
+      btnNext = $("#next").click(function () {
+        if (index + 1 < jumlahVideo) {
+          index++;
+          putarVideo(index);
+        } else {
+          index = 0;
+          putarVideo(index);
+        }
+      }),
+
+      putarVideo = function (id) {
+        $(".videoTerpilih").removeClass("videoTerpilih");
+        $("#tempatdaftarVideo li:eq(" + id + ")").addClass("videoTerpilih");
+        index = id;
+        $("#pemutarVideo").attr("src", mediaPath + daftarVideo[id]);
+      },
+
+      pilihVideo = $("#pemilihVideo").change(function () {
+        var dataBaru = "";
+        var data = $("#pemilihVideo").get(0).files;
+        for (let i = 0; i < data.length; i++) {
+          if (i == 0) {
+            dataBaru = data[i].name;
+          } else {
+            dataBaru += "=+=" + data[i].name;
+          }
+        }
+        localStorage.setItem("daftarVideo", dataBaru);
+        index = 0;
+        susunVideo();
+        // loadTrack(index);
+      })
+
+    var susunVideo = function () {
+      $("#tempatdaftarVideo").html("");
+      if (localStorage.getItem("daftarVideo")) {
+        daftarVideo = localStorage.getItem("daftarVideo").split("=+=");
+      }
+      jumlahVideo = daftarVideo.length;
+      for (let i = 0; i < daftarVideo.length; i++) {
+        $("#tempatdaftarVideo").append(
+          '<li><div class="isidaftarVideo">' + daftarVideo[i] + '</div></li>'
+        );
+      };
+
+      var li = $("#tempatdaftarVideo li").click(function () {
+        var id = parseInt($(this).index());
+        if (id !== index) {
+          putarVideo(id);
+        }
+      })
+
+      putarVideo(index)
+    }
+    susunVideo();
+    putarVideo(index);
+
+  </script>
+</body>
+
+</html>
